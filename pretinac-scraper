@@ -1,0 +1,76 @@
+def login():
+    import requests
+    from bs4 import BeautifulSoup
+    import discord
+    import random
+    import time
+    import os
+    import selenium
+
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.keys import Keys
+    from selenium.webdriver.support.ui import Select
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    predmeti = [
+        "Baze podataka", "Engleski jezik III", "Matematika 3",
+        "Operacijski sustavi III", "Osiguravanje i kontrola kvalitete",
+        "Računala i procesi", "Internet infrastruktura", "Opće obavijesti",
+        "Osnove ekologije"
+    ]
+
+    username = os.environ['username']
+
+    password = os.environ['password']
+
+    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    username = username
+    password = password
+
+    driver.get("https://pretinac.vvg.hr/main.php")
+    driver.find_element_by_id("username").send_keys(username)
+    driver.find_element_by_id("pass").send_keys(password)
+    driver.find_element_by_name("btn_login").click()
+    driver.find_element_by_class_name("txt_input").click()
+    s = Select(driver.find_element_by_class_name('txt_input'))
+    s.select_by_visible_text('Održavanje računalnih sustava')
+
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    soup = soup.find_all(class_="news_box")[0:5]
+    for element in soup:
+        e = element.text
+
+        re = any(r in e for r in predmeti)
+        if re == True:
+            e.strip()
+
+            with open("parsed_data.txt") as f:
+                read_data = f.read()
+            if read_data == e:
+                pass
+            elif read_data != e:
+                with open("parsed_data.txt", "w") as f:
+                    f.writelines(e)
+                with open("parsed_data.txt") as f:
+                    return (f.read())
